@@ -394,7 +394,7 @@ export default function Home() {
         {/* 简洁的头部 */}
         <div className="hero-section">
           <h1 className="hero-title">
-            Icon Finder
+            Icon Hunter
           </h1>
 
           {/* Tab 切换 */}
@@ -485,6 +485,89 @@ export default function Home() {
         {/* 搜索结果区域 */}
         {((activeTab === 'appstore' && apps.length > 0) || (activeTab === 'svg' && svgIcons.length > 0)) && (
           <div className="results-section">
+            {/* 应用网格 */}
+            <div className="apps-grid-section">
+              <h2 className="results-title">
+                {activeTab === 'appstore' ? `找到 ${apps.length} 个应用` : `找到 ${svgIcons.length} 个图标`}
+              </h2>
+              
+              <div className="app-container">
+                <div className="scroll-area scrollbar-hidden">
+                  <div className="app-grid">
+                    {activeTab === 'appstore' ? (
+                      apps.map((app) => (
+                        <div 
+                          key={app.trackId} 
+                          className={`app-item ${selectedApp?.app.trackId === app.trackId ? 'app-item-selected' : ''}`}
+                          onClick={() => handleAppClick(app)}
+                        >
+                          <div className="flex-center">
+                            <img
+                              src={app.artworkUrl100}
+                              alt={app.trackName}
+                              className="app-icon"
+                              title={`${app.trackName} - ${app.artistName}`}
+                            />
+                            
+                            {/* 选中状态指示器 */}
+                            {selectedApp?.app.trackId === app.trackId && (
+                              <div className="selected-indicator">
+                                <span>✓</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <>
+                        {svgIcons.map((icon) => (
+                          <div 
+                            key={icon.id} 
+                            className={`app-item ${selectedSvgIcon?.icon.id === icon.id ? 'app-item-selected' : ''}`}
+                            onClick={() => handleSvgIconClick(icon)}
+                          >
+                            <div className="flex-center">
+                              <img
+                                src={icon.url}
+                                alt={icon.name}
+                                className="app-icon svg-icon"
+                                title={`${icon.name} - ${icon.source}`}
+                              />
+                              
+                              {/* 选中状态指示器 */}
+                              {selectedSvgIcon?.icon.id === icon.id && (
+                                <div className="selected-indicator">
+                                  <span>✓</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                        
+                        {/* Get More 按钮 */}
+                        {svgHasMore && (
+                          <div 
+                            className="app-item get-more-item"
+                            onClick={loadMoreSvgIcons}
+                          >
+                            <div className="flex-center">
+                              <div className="get-more-icon">
+                                {loadingMore ? (
+                                  <div className="loading-spinner"></div>
+                                ) : (
+                                  <span className="get-more-text">···</span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* 应用详情展示 */}
             {activeTab === 'appstore' && selectedApp && (
               <div className="app-details-card">
@@ -571,7 +654,13 @@ export default function Home() {
                       <h3 className="app-title">{selectedSvgIcon.icon.name}</h3>
                       <p className="app-developer">{selectedSvgIcon.icon.source}</p>
                       <p className="app-category">
-                        {selectedSvgIcon.icon.tags?.join(', ') || 'SVG Icon'}
+                        分类：{selectedSvgIcon.icon.category || '通用'}
+                      </p>
+                      <p className="app-category">
+                        作者：{selectedSvgIcon.icon.author || '未知'}
+                      </p>
+                      <p className="app-category">
+                        许可：{selectedSvgIcon.icon.license || '未知'}
                       </p>
                     </div>
                   </div>
@@ -598,89 +687,6 @@ export default function Home() {
                 </div>
               </div>
             )}
-
-            {/* 应用网格 */}
-            <div className="apps-grid-section">
-              <h2 className="results-title">
-                {activeTab === 'appstore' ? `找到 ${apps.length} 个应用` : `找到 ${svgIcons.length} 个图标`}
-              </h2>
-              
-              <div className="app-container">
-                <div className="scroll-area scrollbar-hidden">
-                  <div className="app-grid">
-                    {activeTab === 'appstore' ? (
-                      apps.map((app) => (
-                        <div 
-                          key={app.trackId} 
-                          className={`app-item ${selectedApp?.app.trackId === app.trackId ? 'app-item-selected' : ''}`}
-                          onClick={() => handleAppClick(app)}
-                        >
-                          <div className="flex-center">
-                            <img
-                              src={app.artworkUrl100}
-                              alt={app.trackName}
-                              className="app-icon"
-                              title={`${app.trackName} - ${app.artistName}`}
-                            />
-                            
-                            {/* 选中状态指示器 */}
-                            {selectedApp?.app.trackId === app.trackId && (
-                              <div className="selected-indicator">
-                                <span>✓</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <>
-                        {svgIcons.map((icon) => (
-                          <div 
-                            key={icon.id} 
-                            className={`app-item ${selectedSvgIcon?.icon.id === icon.id ? 'app-item-selected' : ''}`}
-                            onClick={() => handleSvgIconClick(icon)}
-                          >
-                            <div className="flex-center">
-                              <img
-                                src={icon.url}
-                                alt={icon.name}
-                                className="app-icon svg-icon"
-                                title={`${icon.name} - ${icon.source}`}
-                              />
-                              
-                              {/* 选中状态指示器 */}
-                              {selectedSvgIcon?.icon.id === icon.id && (
-                                <div className="selected-indicator">
-                                  <span>✓</span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                        
-                        {/* Get More 按钮 */}
-                        {svgHasMore && (
-                          <div 
-                            className="app-item get-more-item"
-                            onClick={loadMoreSvgIcons}
-                          >
-                            <div className="flex-center">
-                              <div className="get-more-icon">
-                                {loadingMore ? (
-                                  <div className="loading-spinner"></div>
-                                ) : (
-                                  <span className="get-more-text">···</span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         )}
 

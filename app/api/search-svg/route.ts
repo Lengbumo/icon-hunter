@@ -6,7 +6,9 @@ export interface SvgIcon {
   url: string;
   svgContent?: string;
   source: string;
-  tags?: string[];
+  category?: string;
+  license?: string;
+  author?: string;
   downloadUrl?: string;
 }
 
@@ -57,105 +59,135 @@ const fallbackIcons: SvgIcon[] = [
     name: 'search',
     url: 'https://api.iconify.design/mdi:magnify.svg',
     source: 'Material Design Icons',
-    tags: ['search', 'magnify', 'find', 'look']
+    category: 'Action',
+    license: 'Apache 2.0',
+    author: 'Material Design'
   },
   {
     id: 'mdi:home',
     name: 'home',
     url: 'https://api.iconify.design/mdi:home.svg',
     source: 'Material Design Icons',
-    tags: ['home', 'house', 'main', 'dashboard']
+    category: 'Action',
+    license: 'Apache 2.0',
+    author: 'Material Design'
   },
   {
     id: 'mdi:account',
     name: 'user',
     url: 'https://api.iconify.design/mdi:account.svg',
     source: 'Material Design Icons',
-    tags: ['user', 'account', 'profile', 'person']
+    category: 'User',
+    license: 'Apache 2.0',
+    author: 'Material Design'
   },
   {
     id: 'mdi:heart',
     name: 'heart',
     url: 'https://api.iconify.design/mdi:heart.svg',
     source: 'Material Design Icons',
-    tags: ['heart', 'love', 'favorite', 'like']
+    category: 'Social',
+    license: 'Apache 2.0',
+    author: 'Material Design'
   },
   {
     id: 'mdi:star',
     name: 'star',
     url: 'https://api.iconify.design/mdi:star.svg',
     source: 'Material Design Icons',
-    tags: ['star', 'favorite', 'rating', 'bookmark']
+    category: 'Rating',
+    license: 'Apache 2.0',
+    author: 'Material Design'
   },
   {
     id: 'mdi:download',
     name: 'download',
     url: 'https://api.iconify.design/mdi:download.svg',
     source: 'Material Design Icons',
-    tags: ['download', 'save', 'export', 'get']
+    category: 'File',
+    license: 'Apache 2.0',
+    author: 'Material Design'
   },
   {
     id: 'mdi:cog',
     name: 'settings',
     url: 'https://api.iconify.design/mdi:cog.svg',
     source: 'Material Design Icons',
-    tags: ['settings', 'config', 'gear', 'options']
+    category: 'Action',
+    license: 'Apache 2.0',
+    author: 'Material Design'
   },
   {
     id: 'mdi:email',
     name: 'email',
     url: 'https://api.iconify.design/mdi:email.svg',
     source: 'Material Design Icons',
-    tags: ['email', 'mail', 'message', 'contact']
+    category: 'Communication',
+    license: 'Apache 2.0',
+    author: 'Material Design'
   },
   {
     id: 'mdi:file',
     name: 'file',
     url: 'https://api.iconify.design/mdi:file.svg',
     source: 'Material Design Icons',
-    tags: ['file', 'document', 'page', 'paper']
+    category: 'File',
+    license: 'Apache 2.0',
+    author: 'Material Design'
   },
   {
     id: 'mdi:folder',
     name: 'folder',
     url: 'https://api.iconify.design/mdi:folder.svg',
     source: 'Material Design Icons',
-    tags: ['folder', 'directory', 'storage', 'organize']
+    category: 'File',
+    license: 'Apache 2.0',
+    author: 'Material Design'
   },
   {
     id: 'mdi:image',
     name: 'image',
     url: 'https://api.iconify.design/mdi:image.svg',
     source: 'Material Design Icons',
-    tags: ['image', 'picture', 'photo', 'media']
+    category: 'Media',
+    license: 'Apache 2.0',
+    author: 'Material Design'
   },
   {
     id: 'mdi:plus',
     name: 'plus',
     url: 'https://api.iconify.design/mdi:plus.svg',
     source: 'Material Design Icons',
-    tags: ['plus', 'add', 'create', 'new']
+    category: 'Action',
+    license: 'Apache 2.0',
+    author: 'Material Design'
   },
   {
     id: 'mdi:minus',
     name: 'minus',
     url: 'https://api.iconify.design/mdi:minus.svg',
     source: 'Material Design Icons',
-    tags: ['minus', 'remove', 'delete', 'subtract']
+    category: 'Action',
+    license: 'Apache 2.0',
+    author: 'Material Design'
   },
   {
     id: 'mdi:check',
     name: 'check',
     url: 'https://api.iconify.design/mdi:check.svg',
     source: 'Material Design Icons',
-    tags: ['check', 'tick', 'confirm', 'done']
+    category: 'Action',
+    license: 'Apache 2.0',
+    author: 'Material Design'
   },
   {
     id: 'mdi:close',
     name: 'close',
     url: 'https://api.iconify.design/mdi:close.svg',
     source: 'Material Design Icons',
-    tags: ['close', 'cancel', 'exit', 'x']
+    category: 'Action',
+    license: 'Apache 2.0',
+    author: 'Material Design'
   }
 ];
 
@@ -208,7 +240,9 @@ export async function GET(request: NextRequest) {
             name: iconName.replace(/-/g, ' ').replace(/_/g, ' '),
             url: iconUrl,
             source: collectionInfo?.name || collectionId,
-            tags: [iconName, collectionId],
+            category: collectionInfo?.category || 'General',
+            license: collectionInfo?.license?.title || collectionInfo?.license || 'Unknown',
+            author: collectionInfo?.author?.name || collectionInfo?.author || 'Unknown',
             downloadUrl: iconUrl
           });
         }
@@ -230,7 +264,8 @@ export async function GET(request: NextRequest) {
       console.log('使用备用图标数据');
       const fallbackResults = fallbackIcons.filter(icon => 
         icon.name.toLowerCase().includes(term.toLowerCase()) ||
-        icon.tags?.some(tag => tag.toLowerCase().includes(term.toLowerCase()))
+        icon.category?.toLowerCase().includes(term.toLowerCase()) ||
+        icon.author?.toLowerCase().includes(term.toLowerCase())
       ).slice(0, limit);
 
       return NextResponse.json({
@@ -261,7 +296,8 @@ export async function GET(request: NextRequest) {
     console.log('API失败，使用备用图标数据');
     const fallbackResults = fallbackIcons.filter(icon => 
       icon.name.toLowerCase().includes(term.toLowerCase()) ||
-      icon.tags?.some(tag => tag.toLowerCase().includes(term.toLowerCase()))
+      icon.category?.toLowerCase().includes(term.toLowerCase()) ||
+      icon.author?.toLowerCase().includes(term.toLowerCase())
     ).slice(0, limit);
 
     if (fallbackResults.length > 0) {

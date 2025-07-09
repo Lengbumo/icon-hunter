@@ -110,7 +110,9 @@ export interface SvgIcon {
   url: string;
   svgContent?: string;
   source: string;
-  tags?: string[];
+  category?: string;
+  license?: string;
+  author?: string;
   downloadUrl?: string;
 }
 
