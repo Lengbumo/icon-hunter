@@ -101,4 +101,33 @@ export const POPULAR_CATEGORIES = [
 export type CategoryType = typeof POPULAR_CATEGORIES[number];
 
 export const ICON_SIZES = ['60', '100', '512'] as const;
-export type IconSizeType = typeof ICON_SIZES[number]; 
+export type IconSizeType = typeof ICON_SIZES[number];
+
+// SVG 图标相关类型
+export interface SvgIcon {
+  id: string;
+  name: string;
+  url: string;
+  svgContent?: string;
+  source: string;
+  tags?: string[];
+  downloadUrl?: string;
+}
+
+export interface SvgSearchResponse {
+  resultCount: number;
+  results: SvgIcon[];
+  searchTerm: string;
+  offset: number;
+  limit: number;
+  hasMore: boolean;
+  total: number;
+}
+
+// Tab 类型
+export type TabType = 'appstore' | 'svg';
+
+// 选中的SVG图标类型
+export interface SelectedSvgIcon {
+  icon: SvgIcon;
+} 
