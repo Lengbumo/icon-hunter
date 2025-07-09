@@ -44,41 +44,6 @@ export interface BatchAppsResponse {
   hasMore: boolean;
 }
 
-export interface DownloadIconResponse {
-  success: boolean;
-  fileName?: string;
-  filePath?: string;
-  message: string;
-  error?: string;
-}
-
-export interface DownloadedFilesResponse {
-  files: DownloadedFile[];
-  count: number;
-  message: string;
-}
-
-// 下载相关类型
-export interface DownloadedFile {
-  name: string;
-  url: string;
-}
-
-export interface DownloadProgress {
-  [key: number]: {
-    downloading: boolean;
-    success: boolean;
-    error?: string;
-  };
-}
-
-export interface DownloadRequest {
-  iconUrl: string;
-  appName: string;
-  trackId: number;
-  size: '60' | '100' | '512';
-}
-
 // 错误类型
 export interface ApiError {
   error: string;
@@ -87,6 +52,31 @@ export interface ApiError {
 
 // UI 相关类型
 export type IconSize = '60' | '100' | '512';
+
+// 下载进度类型
+export interface DownloadStatus {
+  downloading: boolean;
+  success: boolean;
+  error?: string;
+}
+
+export interface DownloadProgress {
+  [trackId: number]: DownloadStatus;
+}
+
+// 已下载文件类型
+export interface DownloadedFile {
+  name: string;
+  url: string;
+  size?: number;
+  downloadTime?: string;
+}
+
+// 选中的应用类型
+export interface SelectedApp {
+  app: AppResult;
+  selectedSize: IconSize;
+}
 
 export interface SearchFilters {
   country?: string;

@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { AppResult, DownloadProgress, DownloadedFile, IconSize } from '@/types';
+import { AppResult, DownloadProgress, DownloadedFile, IconSize, SelectedApp } from '@/types';
+import { FiDownload, FiCopy, FiCheck } from 'react-icons/fi';
 
 export default function Home() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -11,7 +12,9 @@ export default function Home() {
   const [downloadProgress, setDownloadProgress] = useState<DownloadProgress>({});
   const [batchLoading, setBatchLoading] = useState(false);
   const [downloadedFiles, setDownloadedFiles] = useState<DownloadedFile[]>([]);
-  const [showDownloaded, setShowDownloaded] = useState(false);
+  const [showDownloaded, setShowDownloaded] = useState(true);
+  const [selectedApp, setSelectedApp] = useState<SelectedApp | null>(null);
+  const [copySuccess, setCopySuccess] = useState(false);
 
   const searchApps = async (term: string) => {
     if (!term.trim()) return;
@@ -52,6 +55,128 @@ export default function Home() {
       setError('批量获取失败，请检查网络连接');
     } finally {
       setBatchLoading(false);
+    }
+  };
+
+  const handleAppClick = (app: AppResult) => {
+    setSelectedApp({
+      app,
+      selectedSize: '100' // 默认选择100px
+    });
+  };
+
+  const handleSizeSelect = (size: IconSize) => {
+    if (selectedApp) {
+      setSelectedApp({
+        ...selectedApp,
+        selectedSize: size
+      });
+    }
+  };
+
+  const downloadToLocal = async (app: AppResult, size: IconSize) => {
+    const iconUrl = size === '60' ? app.artworkUrl60 : 
+                   size === '100' ? app.artworkUrl100 : 
+                   app.artworkUrl512;
+    
+    setDownloadProgress(prev => ({
+      ...prev,
+      [app.trackId]: { downloading: true, success: false }
+    }));
+
+    try {
+      const response = await fetch(iconUrl);
+      const blob = await response.blob();
+      
+      // 创建下载链接
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      
+      // 从URL中提取文件扩展名
+      const urlParts = iconUrl.split('.');
+      const extension = urlParts[urlParts.length - 1];
+      
+      link.download = `${app.trackName}_${app.trackId}_${size}.${extension}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // 清理URL对象
+      URL.revokeObjectURL(url);
+      
+      setDownloadProgress(prev => ({
+        ...prev,
+        [app.trackId]: { downloading: false, success: true }
+      }));
+      
+    } catch (err) {
+      setDownloadProgress(prev => ({
+        ...prev,
+        [app.trackId]: { downloading: false, success: false, error: '下载失败' }
+      }));
+    }
+  };
+
+  const copyToClipboard = async (app: AppResult, size: IconSize) => {
+    const iconUrl = size === '60' ? app.artworkUrl60 : 
+                   size === '100' ? app.artworkUrl100 : 
+                   app.artworkUrl512;
+    
+    try {
+      // 获取图片数据
+      const response = await fetch(iconUrl);
+      const blob = await response.blob();
+      
+      // 创建Canvas将图片转换为PNG格式
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      const imageUrl = URL.createObjectURL(blob);
+      
+      await new Promise((resolve, reject) => {
+        img.onload = () => {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx?.drawImage(img, 0, 0);
+          URL.revokeObjectURL(imageUrl); // 清理内存
+          resolve(null);
+        };
+        img.onerror = () => {
+          URL.revokeObjectURL(imageUrl); // 清理内存
+          reject(new Error('图片加载失败'));
+        };
+        img.src = imageUrl;
+      });
+      
+      // 转换为PNG格式的Blob
+      const pngBlob = await new Promise<Blob>((resolve) => {
+        canvas.toBlob((blob) => {
+          resolve(blob!);
+        }, 'image/png');
+      });
+      
+      // 复制PNG图片到剪贴板
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          'image/png': pngBlob
+        })
+      ]);
+      
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    } catch (err) {
+      console.error('复制图片失败:', err);
+      
+      // 如果复制图片失败，降级为复制链接
+      try {
+        await navigator.clipboard.writeText(iconUrl);
+        setCopySuccess(true);
+        setTimeout(() => setCopySuccess(false), 2000);
+      } catch (fallbackErr) {
+        console.error('复制链接也失败:', fallbackErr);
+      }
     }
   };
 
@@ -125,21 +250,21 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-2 sm:p-4 overflow-x-hidden w-full">
-      <div className="max-w-7xl mx-auto w-full px-0">
+    <div className="main-container">
+      <div className="content-wrapper">
         {/* 头部 */}
-        <div className="text-center mb-6 sm:mb-8 w-full">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-2">
+        <div className="header">
+          <h1 className="header-title">
             🎯 Icon Hunter
           </h1>
-          <p className="text-sm sm:text-base text-gray-600 px-2">
+          <p className="header-subtitle">
             发现并下载 App Store 应用图标
           </p>
         </div>
 
         {/* 搜索和批量获取区域 */}
-        <div className="bg-white rounded-xl shadow-lg p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 w-full max-w-full">
-          <div className="flex flex-col gap-3 sm:gap-4 mb-3 sm:mb-4 w-full">
+        <div className="card">
+          <div className="button-group">
             <div className="w-full">
               <input
                 type="text"
@@ -147,196 +272,149 @@ export default function Home() {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && searchApps(searchTerm)}
                 placeholder="搜索应用名称..."
-                className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+                className="search-input"
               />
             </div>
-            <div className="flex flex-col gap-2 w-full">
+            <div className="button-group">
               <button
                 onClick={() => searchApps(searchTerm)}
                 disabled={loading || !searchTerm.trim()}
-                className="w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm sm:text-base"
+                className="btn btn-primary"
               >
                 {loading ? '搜索中...' : '搜索'}
               </button>
               <button
                 onClick={batchGetApps}
                 disabled={batchLoading}
-                className="w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm sm:text-base"
+                className="btn btn-success"
               >
                 {batchLoading ? '获取中...' : '批量获取热门应用'}
               </button>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-2 sm:gap-3 w-full">
-            <button
-              onClick={() => setShowDownloaded(!showDownloaded)}
-              className="w-full px-3 sm:px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 font-medium transition-colors text-sm sm:text-base"
-            >
-              {showDownloaded ? '隐藏' : '显示'}已下载图标 ({downloadedFiles.length})
-            </button>
-            
-            <div className="text-xs sm:text-sm text-gray-600 bg-blue-50 px-3 py-2 rounded-lg border-l-4 border-blue-400 w-full">
-              💡 <span className="hidden sm:inline">提示：鼠标悬浮在图标上可查看应用信息并下载不同尺寸的图标</span>
-              <span className="sm:hidden">点击图标下载不同尺寸</span>
             </div>
           </div>
         </div>
 
         {/* 错误信息 */}
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6">
+          <div className="error-message">
             {error}
           </div>
         )}
 
-        {/* 已下载图标列表 */}
+        {/* 图标详情展示 */}
         {showDownloaded && (
-          <div className="bg-white rounded-xl shadow-lg p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 w-full max-w-full">
-            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-3 sm:mb-4">已下载的图标</h2>
-            {downloadedFiles.length > 0 ? (
-              <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12 gap-2 sm:gap-3 md:gap-4 w-full">
-                {downloadedFiles.map((file, index) => (
-                  <div key={index} className="text-center w-full">
-                    <img
-                      src={file.url}
-                      alt={file.name}
-                      className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 mx-auto rounded-lg sm:rounded-xl shadow-md max-w-full"
-                    />
-                    <p className="text-xs text-gray-600 mt-1 sm:mt-2 truncate w-full" title={file.name}>
-                      {file.name}
-                    </p>
+          <div className="card">
+            {selectedApp ? (
+              <div className="selected-app-details">
+                <div className="app-info">
+                  <img
+                    src={selectedApp.selectedSize === '60' ? selectedApp.app.artworkUrl60 : 
+                         selectedApp.selectedSize === '100' ? selectedApp.app.artworkUrl100 : 
+                         selectedApp.app.artworkUrl512}
+                    alt={selectedApp.app.trackName}
+                    className="selected-app-icon"
+                  />
+                  <div className="app-details">
+                    <h3 className="app-title">{selectedApp.app.trackName}</h3>
+                    <p className="app-developer">{selectedApp.app.artistName}</p>
                   </div>
-                ))}
+                </div>
+                
+                <div className="download-controls">
+                  <div className="size-selector">
+                    <label className="size-label">选择尺寸：</label>
+                    <div className="size-buttons">
+                      {['60', '100', '512'].map((size) => (
+                        <button
+                          key={size}
+                          onClick={() => handleSizeSelect(size as IconSize)}
+                          className={`btn-sm ${selectedApp.selectedSize === size ? 'btn-sm-selected' : 'btn-sm-blue'}`}
+                        >
+                          {size}px
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div className="download-buttons">
+                    <button
+                      onClick={() => downloadToLocal(selectedApp.app, selectedApp.selectedSize)}
+                      disabled={downloadProgress[selectedApp.app.trackId]?.downloading}
+                      className="btn-icon btn-icon-primary"
+                      title={downloadProgress[selectedApp.app.trackId]?.downloading ? '下载中...' : '下载到本地'}
+                    >
+                      <FiDownload size={18} />
+                    </button>
+                    
+                    <button
+                      onClick={() => copyToClipboard(selectedApp.app, selectedApp.selectedSize)}
+                      className="btn-icon btn-icon-secondary"
+                      title={copySuccess ? '已复制' : '复制图标'}
+                    >
+                      {copySuccess ? <FiCheck size={18} /> : <FiCopy size={18} />}
+                    </button>
+                  </div>
+                  
+                  {downloadProgress[selectedApp.app.trackId]?.success && (
+                    <div className="download-success">
+                      ✅ 下载成功！
+                    </div>
+                  )}
+                  
+                  {downloadProgress[selectedApp.app.trackId]?.error && (
+                    <div className="download-error">
+                      ❌ 下载失败：{downloadProgress[selectedApp.app.trackId]?.error}
+                    </div>
+                  )}
+                </div>
               </div>
             ) : (
-              <p className="text-gray-500 text-sm sm:text-base">暂无已下载的图标</p>
+              <div className="empty-state">
+                点击应用图标查看详情
+              </div>
             )}
           </div>
         )}
 
         {/* 应用列表 */}
-        <div className="bg-white rounded-xl shadow-lg p-3 sm:p-4 md:p-6 w-full max-w-full">
-          <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-3 sm:mb-4 md:mb-6">
+        <div className="card">
+          <h2 className="section-title">
             应用列表 ({apps.length})
           </h2>
           
           {apps.length > 0 ? (
-            <div className="border border-gray-200 rounded-lg bg-gray-50 p-2 sm:p-3 md:p-4 app-grid-container w-full max-w-full">
-              <div className="max-h-80 sm:max-h-96 overflow-y-auto scrollbar-hidden w-full">
-                <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12 gap-2 sm:gap-3 md:gap-4 pb-6 sm:pb-8 w-full">
+            <div className="app-container">
+              <div className="scroll-area scrollbar-hidden">
+                <div className="app-grid">
                   {apps.map((app) => (
-                    <div key={app.trackId} className="group relative w-full">
-                      {/* 应用图标 */}
-                      <div className="relative w-full flex justify-center">
+                    <div 
+                      key={app.trackId} 
+                      className={`app-item ${selectedApp?.app.trackId === app.trackId ? 'app-item-selected' : ''}`}
+                      onClick={() => handleAppClick(app)}
+                    >
+                      <div className="flex-center">
                         <img
                           src={app.artworkUrl100}
                           alt={app.trackName}
-                          className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-lg sm:rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer max-w-full"
+                          className="app-icon"
                           title={`${app.trackName} - ${app.artistName}`}
                         />
                         
-                        {/* 下载状态指示器 */}
-                        {downloadProgress[app.trackId]?.downloading && (
-                          <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg sm:rounded-xl flex items-center justify-center">
-                            <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        {/* 选中状态指示器 */}
+                        {selectedApp?.app.trackId === app.trackId && (
+                          <div className="selected-indicator">
+                            <span>✓</span>
                           </div>
                         )}
-                        
-                        {downloadProgress[app.trackId]?.success && (
-                          <div className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-4 h-4 sm:w-5 sm:h-5 bg-green-500 rounded-full flex items-center justify-center">
-                            <span className="text-white text-xs">✓</span>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* 悬浮时显示的下载按钮 */}
-                      <div className="hidden sm:block absolute left-1/2 transform -translate-x-1/2 -bottom-16 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20 pointer-events-none group-hover:pointer-events-auto">
-                        <div className="bg-white rounded-lg shadow-xl p-2 sm:p-3 border border-gray-200 min-w-max max-w-xs">
-                          <div className="text-xs font-medium text-gray-800 mb-1 sm:mb-2 text-center truncate max-w-20 sm:max-w-24">
-                            {app.trackName}
-                          </div>
-                          <div className="text-xs text-gray-500 mb-1 sm:mb-2 text-center truncate">
-                            {app.artistName}
-                          </div>
-                          <div className="flex gap-1 justify-center">
-                            {['60', '100', '512'].map((size) => {
-                              const progress = downloadProgress[app.trackId];
-                              return (
-                                <button
-                                  key={size}
-                                  onClick={() => downloadIcon(app, size as IconSize)}
-                                  disabled={progress?.downloading}
-                                  className={`px-1.5 sm:px-2 py-1 text-xs rounded font-medium transition-colors ${
-                                    progress?.success
-                                      ? 'bg-green-100 text-green-700'
-                                      : progress?.downloading
-                                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                      : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-                                  }`}
-                                  title={`下载 ${size}px 图标`}
-                                >
-                                  {size}
-                                </button>
-                              );
-                            })}
-                          </div>
-                          {downloadProgress[app.trackId]?.error && (
-                            <p className="text-red-500 text-xs mt-1 text-center">
-                              下载失败
-                            </p>
-                          )}
-                          {/* 小箭头 */}
-                          <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
-                            <div className="w-0 h-0 border-l-3 border-r-3 border-t-3 sm:border-l-4 sm:border-r-4 sm:border-t-4 border-transparent border-t-white"></div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* 移动端点击显示下载选项 */}
-                      <div className="sm:hidden">
-                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-black bg-opacity-30 rounded-lg flex items-center justify-center">
-                          <div className="flex gap-1">
-                            {['60', '100', '512'].map((size) => {
-                              const progress = downloadProgress[app.trackId];
-                              return (
-                                <button
-                                  key={size}
-                                  onClick={() => downloadIcon(app, size as IconSize)}
-                                  disabled={progress?.downloading}
-                                  className={`px-1.5 py-1 text-xs rounded font-medium transition-colors ${
-                                    progress?.success
-                                      ? 'bg-green-200 text-green-800'
-                                      : progress?.downloading
-                                      ? 'bg-gray-200 text-gray-600 cursor-not-allowed'
-                                      : 'bg-white text-blue-700 hover:bg-blue-50'
-                                  }`}
-                                  title={`下载 ${size}px 图标`}
-                                >
-                                  {size}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
-              
-              {/* 滚动提示 */}
-              {/* <div className="flex justify-between items-center mt-4 pt-3 border-t border-gray-200">
-                <div className="text-sm text-gray-600">
-                  共找到 <span className="font-semibold text-blue-600">{apps.length}</span> 个应用
-                </div>
-              </div> */}
             </div>
           ) : (
-            <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">
-                {loading || batchLoading ? '加载中...' : '输入关键词搜索应用，或点击批量获取热门应用'}
-              </p>
+            <div className="empty-state">
+              {loading || batchLoading ? '加载中...' : '输入关键词搜索应用，或点击批量获取热门应用'}
             </div>
           )}
         </div>
