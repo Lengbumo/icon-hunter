@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { AppResult, DownloadProgress, DownloadedFile, IconSize, SelectedApp } from '@/types';
-import { FiDownload, FiCopy, FiCheck } from 'react-icons/fi';
+import { FiDownload, FiCopy, FiCheck, FiSearch } from 'react-icons/fi';
 
 export default function Home() {
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCountry, setSelectedCountry] = useState('All');
   const [apps, setApps] = useState<AppResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -16,6 +17,19 @@ export default function Home() {
   const [selectedApp, setSelectedApp] = useState<SelectedApp | null>(null);
   const [copySuccess, setCopySuccess] = useState(false);
 
+  // 国家选项列表
+  const countryOptions = [
+    { code: 'All', name: 'All Countries', flag: '🌍' },
+    { code: 'US', name: 'United States', flag: '🇺🇸' },
+    { code: 'CN', name: 'China', flag: '🇨🇳' },
+    { code: 'JP', name: 'Japan', flag: '🇯🇵' },
+    { code: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
+    { code: 'DE', name: 'Germany', flag: '🇩🇪' },
+    { code: 'FR', name: 'France', flag: '🇫🇷' },
+    { code: 'CA', name: 'Canada', flag: '🇨🇦' },
+    { code: 'AU', name: 'Australia', flag: '🇦🇺' },
+  ];
+
   const searchApps = async (term: string) => {
     if (!term.trim()) return;
     
@@ -23,7 +37,8 @@ export default function Home() {
     setError('');
     
     try {
-      const response = await fetch(`/api/search-apps?term=${encodeURIComponent(term)}&limit=50`);
+      const countryParam = selectedCountry === 'All' ? '' : `&country=${selectedCountry}`;
+      const response = await fetch(`/api/search-apps?term=${encodeURIComponent(term)}&limit=50${countryParam}`);
       const data = await response.json();
       
       if (data.error) {
@@ -43,7 +58,8 @@ export default function Home() {
     setError('');
     
     try {
-      const response = await fetch('/api/batch-apps?limit=100');
+      const countryParam = selectedCountry === 'All' ? '' : `&country=${selectedCountry}`;
+      const response = await fetch(`/api/batch-apps?limit=100${countryParam}`);
       const data = await response.json();
       
       if (data.error) {
@@ -75,8 +91,7 @@ export default function Home() {
   };
 
   const downloadToLocal = async (app: AppResult, size: IconSize) => {
-    const iconUrl = size === '52' ? app.artworkUrl60 :
-                   size === '60' ? app.artworkUrl60 : 
+    const iconUrl = size === '60' ? app.artworkUrl60 : 
                    size === '100' ? app.artworkUrl100 : 
                    app.artworkUrl512;
     
@@ -120,8 +135,7 @@ export default function Home() {
   };
 
   const copyToClipboard = async (app: AppResult, size: IconSize) => {
-    const iconUrl = size === '52' ? app.artworkUrl60 :
-                   size === '60' ? app.artworkUrl60 : 
+    const iconUrl = size === '60' ? app.artworkUrl60 : 
                    size === '100' ? app.artworkUrl100 : 
                    app.artworkUrl512;
     
@@ -183,8 +197,7 @@ export default function Home() {
   };
 
   const downloadIcon = async (app: AppResult, size: IconSize) => {
-    const iconUrl = size === '52' ? app.artworkUrl60 :
-                   size === '60' ? app.artworkUrl60 : 
+    const iconUrl = size === '60' ? app.artworkUrl60 : 
                    size === '100' ? app.artworkUrl100 : 
                    app.artworkUrl512;
     
@@ -258,20 +271,39 @@ export default function Home() {
         {/* 简洁的头部 */}
         <div className="hero-section">
           <h1 className="hero-title">
-            App Store Icon Finder
+            Icon Finder
           </h1>
           
           {/* 主要搜索区域 */}
           <div className="search-section">
             <div className="search-container">
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && searchApps(searchTerm)}
-                placeholder="搜索 App Store 应用..."
-                className="hero-search-input"
-              />
+              {/* 组合搜索输入框 */}
+              <div className="search-input-group">
+                {/* 国家选择下拉框 */}
+                <div className="country-selector">
+                  <select
+                    value={selectedCountry}
+                    onChange={(e) => setSelectedCountry(e.target.value)}
+                    className="country-select"
+                  >
+                    {countryOptions.map((country) => (
+                      <option key={country.code} value={country.code}>
+                        {country.code === 'All' ? country.name : country.flag + ' ' + country.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && searchApps(searchTerm)}
+                  placeholder="搜索 App Store 应用..."
+                  className="hero-search-input"
+                />
+              </div>
+              
               <button
                 onClick={() => searchApps(searchTerm)}
                 disabled={loading || !searchTerm.trim()}
@@ -314,8 +346,7 @@ export default function Home() {
                 <div className="selected-app-details">
                   <div className="app-info">
                     <img
-                      src={selectedApp.selectedSize === '52' ? selectedApp.app.artworkUrl60 :
-                           selectedApp.selectedSize === '60' ? selectedApp.app.artworkUrl60 : 
+                      src={selectedApp.selectedSize === '60' ? selectedApp.app.artworkUrl60 : 
                            selectedApp.selectedSize === '100' ? selectedApp.app.artworkUrl100 : 
                            selectedApp.app.artworkUrl512}
                       alt={selectedApp.app.trackName}
@@ -332,7 +363,7 @@ export default function Home() {
                     <div className="size-selector">
                       <label className="size-label">选择尺寸：</label>
                       <div className="size-buttons">
-                        {['52', '60', '100', '512'].map((size) => (
+                        {['60', '100', '512'].map((size) => (
                           <button
                             key={size}
                             onClick={() => handleSizeSelect(size as IconSize)}
@@ -414,6 +445,18 @@ export default function Home() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* 空状态提示 */}
+        {!loading && !batchLoading && !error && apps.length === 0 && (
+          <div className="empty-state-container">
+            <div className="empty-state-content">
+              <div className="search-icon-container">
+                <FiSearch size={60} className="search-icon" />
+              </div>
+              <p className="empty-state-text">输入内容开始搜索</p>
             </div>
           </div>
         )}
