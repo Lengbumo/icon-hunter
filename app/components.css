@@ -1,92 +1,17 @@
-/* ===== 容器样式 ===== */
+/* 容器样式 */
 .main-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #eff6ff 0%, #faf5ff 100%);
-  padding: 0.5rem;
-  overflow-x: hidden;
-  width: 100%;
-}
-
-@media (min-width: 640px) {
-  .main-container {
-    padding: 1rem;
-  }
-}
-
-.content-wrapper {
-  max-width: 112rem;
-  margin: 0 auto;
-  width: 100%;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   padding: 0;
 }
 
-/* ===== 头部样式 ===== */
-.header {
-  text-align: center;
-  margin-bottom: 1.5rem;
-  width: 100%;
+.content-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 100vh;
 }
 
-@media (min-width: 640px) {
-  .header {
-    margin-bottom: 2rem;
-  }
-}
-
-.header-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 0.5rem;
-}
-
-@media (min-width: 640px) {
-  .header-title {
-    font-size: 1.875rem;
-  }
-}
-
-@media (min-width: 768px) {
-  .header-title {
-    font-size: 2.25rem;
-  }
-}
-
-.header-subtitle {
-  font-size: 0.875rem;
-  color: #4b5563;
-  padding: 0 0.5rem;
-}
-
-@media (min-width: 640px) {
-  .header-subtitle {
-    font-size: 1rem;
-  }
-}
-
-/* ===== 卡片样式 ===== */
-.card {
-  background: white;
-  border-radius: 0.75rem;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  padding: 0.75rem;
-  margin-bottom: 1rem;
-  width: 100%;
-  max-width: 100%;
-}
-
-@media (min-width: 640px) {
-  .card {
-    padding: 1rem;
-    margin-bottom: 1.5rem;
-  }
-}
-
-@media (min-width: 768px) {
-  .card {
-    padding: 1.5rem;
-  }
-}
+/* 以下样式已移除，现在使用新的 Hero Section 设计 */
 
 /* ===== 输入框样式 ===== */
 .search-input {
@@ -945,4 +870,238 @@
   padding: 3rem 0;
   color: #6b7280;
   font-size: 1.125rem;
+}
+
+/* Hero Section - 简洁的首页设计 */
+.hero-section {
+  text-align: center;
+  padding: 2rem 1rem;
+  min-height: 25vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+}
+
+/* 搜索区域 */
+.search-section {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.search-container {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+.hero-search-input {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.2s ease;
+  background-color: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.hero-search-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.hero-search-btn {
+  padding: 1rem 1.5rem;
+  background-color: #1f2937;
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 100px;
+  white-space: nowrap;
+}
+
+.hero-search-btn:hover:not(:disabled) {
+  background-color: #374151;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.hero-search-btn:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.hero-batch-btn {
+  padding: 1rem 1.5rem;
+  background-color: #6b7280;
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 120px;
+  white-space: nowrap;
+}
+
+.hero-batch-btn:hover:not(:disabled) {
+  background-color: #4b5563;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.hero-batch-btn:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* 搜索提示样式已移除 - 现在使用直接的按钮布局 */
+
+/* 加载状态 */
+.loading-state {
+  text-align: center;
+  padding: 1rem;
+  color: #6b7280;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #f3f4f6;
+  border-top: 3px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 0.75rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-state p {
+  font-size: 1rem;
+  color: #4b5563;
+}
+
+/* 搜索结果区域 */
+.results-section {
+  margin-top: 1rem;
+  padding: 0 1rem;
+}
+
+.app-details-card {
+  background-color: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.apps-grid-section {
+  background-color: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.results-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* 响应式设计 - Hero Section */
+@media (max-width: 640px) {
+  .hero-title {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .hero-section {
+    padding: 1.5rem 1rem;
+    min-height: 20vh;
+  }
+  
+  .search-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .hero-search-input {
+    padding: 0.875rem 1.25rem;
+  }
+  
+  .hero-search-btn,
+  .hero-batch-btn {
+    padding: 0.875rem 1.25rem;
+    min-width: auto;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 768px) {
+  .search-container {
+    flex-wrap: wrap;
+  }
+  
+  .hero-search-input {
+    flex: 1;
+    min-width: 300px;
+  }
+  
+  .hero-search-btn,
+  .hero-batch-btn {
+    flex: 0 0 auto;
+  }
+}
+
+@media (min-width: 768px) {
+  .hero-title {
+    font-size: 3rem;
+  }
+  
+  .hero-section {
+    padding: 2rem 1rem;
+    min-height: 25vh;
+  }
+  
+  .search-container {
+    align-items: center;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-title {
+    font-size: 3.5rem;
+  }
+  
+  .hero-section {
+    padding: 2.5rem 1rem;
+    min-height: 30vh;
+  }
 }

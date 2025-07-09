@@ -51,7 +51,7 @@ export interface ApiError {
 }
 
 // UI 相关类型
-export type IconSize = '60' | '100' | '512';
+export type IconSize = '52' | '60' | '100' | '512';
 
 // 下载进度类型
 export interface DownloadStatus {
@@ -100,5 +100,5 @@ export const POPULAR_CATEGORIES = [
 
 export type CategoryType = typeof POPULAR_CATEGORIES[number];
 
-export const ICON_SIZES = ['60', '100', '512'] as const;
+export const ICON_SIZES = ['52', '60', '100', '512'] as const;
 export type IconSizeType = typeof ICON_SIZES[number]; 

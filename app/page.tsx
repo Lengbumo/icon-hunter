@@ -12,7 +12,7 @@ export default function Home() {
   const [downloadProgress, setDownloadProgress] = useState<DownloadProgress>({});
   const [batchLoading, setBatchLoading] = useState(false);
   const [downloadedFiles, setDownloadedFiles] = useState<DownloadedFile[]>([]);
-  const [showDownloaded, setShowDownloaded] = useState(true);
+  const [showDownloaded, setShowDownloaded] = useState(true);   
   const [selectedApp, setSelectedApp] = useState<SelectedApp | null>(null);
   const [copySuccess, setCopySuccess] = useState(false);
 
@@ -75,7 +75,8 @@ export default function Home() {
   };
 
   const downloadToLocal = async (app: AppResult, size: IconSize) => {
-    const iconUrl = size === '60' ? app.artworkUrl60 : 
+    const iconUrl = size === '52' ? app.artworkUrl60 :
+                   size === '60' ? app.artworkUrl60 : 
                    size === '100' ? app.artworkUrl100 : 
                    app.artworkUrl512;
     
@@ -119,7 +120,8 @@ export default function Home() {
   };
 
   const copyToClipboard = async (app: AppResult, size: IconSize) => {
-    const iconUrl = size === '60' ? app.artworkUrl60 : 
+    const iconUrl = size === '52' ? app.artworkUrl60 :
+                   size === '60' ? app.artworkUrl60 : 
                    size === '100' ? app.artworkUrl100 : 
                    app.artworkUrl512;
     
@@ -181,7 +183,8 @@ export default function Home() {
   };
 
   const downloadIcon = async (app: AppResult, size: IconSize) => {
-    const iconUrl = size === '60' ? app.artworkUrl60 : 
+    const iconUrl = size === '52' ? app.artworkUrl60 :
+                   size === '60' ? app.artworkUrl60 : 
                    size === '100' ? app.artworkUrl100 : 
                    app.artworkUrl512;
     
@@ -252,45 +255,46 @@ export default function Home() {
   return (
     <div className="main-container">
       <div className="content-wrapper">
-        {/* 头部 */}
-        <div className="header">
-          <h1 className="header-title">
-            🎯 Icon Hunter
+        {/* 简洁的头部 */}
+        <div className="hero-section">
+          <h1 className="hero-title">
+            App Store Icon Finder
           </h1>
-          <p className="header-subtitle">
-            发现并下载 App Store 应用图标
-          </p>
-        </div>
-
-        {/* 搜索和批量获取区域 */}
-        <div className="card">
-          <div className="button-group">
-            <div className="w-full">
+          
+          {/* 主要搜索区域 */}
+          <div className="search-section">
+            <div className="search-container">
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && searchApps(searchTerm)}
-                placeholder="搜索应用名称..."
-                className="search-input"
+                placeholder="搜索 App Store 应用..."
+                className="hero-search-input"
               />
-            </div>
-            <div className="button-group">
               <button
                 onClick={() => searchApps(searchTerm)}
                 disabled={loading || !searchTerm.trim()}
-                className="btn btn-primary"
+                className="hero-search-btn"
               >
                 {loading ? '搜索中...' : '搜索'}
               </button>
               <button
                 onClick={batchGetApps}
                 disabled={batchLoading}
-                className="btn btn-success"
+                className="hero-batch-btn"
               >
-                {batchLoading ? '获取中...' : '批量获取热门应用'}
+                {batchLoading ? '获取中...' : '热门应用'}
               </button>
             </div>
+            
+            {/* 加载状态 */}
+            {(loading || batchLoading) && (
+              <div className="loading-state">
+                <div className="spinner"></div>
+                <p>{loading ? '搜索中...' : '获取热门应用中...'}</p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -301,123 +305,118 @@ export default function Home() {
           </div>
         )}
 
-        {/* 图标详情展示 */}
-        {showDownloaded && (
-          <div className="card">
-            {selectedApp ? (
-              <div className="selected-app-details">
-                <div className="app-info">
-                  <img
-                    src={selectedApp.selectedSize === '60' ? selectedApp.app.artworkUrl60 : 
-                         selectedApp.selectedSize === '100' ? selectedApp.app.artworkUrl100 : 
-                         selectedApp.app.artworkUrl512}
-                    alt={selectedApp.app.trackName}
-                    className="selected-app-icon"
-                  />
-                  <div className="app-details">
-                    <h3 className="app-title">{selectedApp.app.trackName}</h3>
-                    <p className="app-developer">{selectedApp.app.artistName}</p>
-                  </div>
-                </div>
-                
-                <div className="download-controls">
-                  <div className="size-selector">
-                    <label className="size-label">选择尺寸：</label>
-                    <div className="size-buttons">
-                      {['60', '100', '512'].map((size) => (
-                        <button
-                          key={size}
-                          onClick={() => handleSizeSelect(size as IconSize)}
-                          className={`btn-sm ${selectedApp.selectedSize === size ? 'btn-sm-selected' : 'btn-sm-blue'}`}
-                        >
-                          {size}px
-                        </button>
-                      ))}
+        {/* 搜索结果区域 */}
+        {apps.length > 0 && (
+          <div className="results-section">
+            {/* 应用详情展示 */}
+            {selectedApp && (
+              <div className="app-details-card">
+                <div className="selected-app-details">
+                  <div className="app-info">
+                    <img
+                      src={selectedApp.selectedSize === '52' ? selectedApp.app.artworkUrl60 :
+                           selectedApp.selectedSize === '60' ? selectedApp.app.artworkUrl60 : 
+                           selectedApp.selectedSize === '100' ? selectedApp.app.artworkUrl100 : 
+                           selectedApp.app.artworkUrl512}
+                      alt={selectedApp.app.trackName}
+                      className="selected-app-icon"
+                    />
+                    <div className="app-details">
+                      <h3 className="app-title">{selectedApp.app.trackName}</h3>
+                      <p className="app-developer">{selectedApp.app.artistName}</p>
+                      <p className="app-category">{selectedApp.app.primaryGenreName}</p>
                     </div>
                   </div>
                   
-                  <div className="download-buttons">
-                    <button
-                      onClick={() => downloadToLocal(selectedApp.app, selectedApp.selectedSize)}
-                      disabled={downloadProgress[selectedApp.app.trackId]?.downloading}
-                      className="btn-icon btn-icon-primary"
-                      title={downloadProgress[selectedApp.app.trackId]?.downloading ? '下载中...' : '下载到本地'}
-                    >
-                      <FiDownload size={18} />
-                    </button>
-                    
-                    <button
-                      onClick={() => copyToClipboard(selectedApp.app, selectedApp.selectedSize)}
-                      className="btn-icon btn-icon-secondary"
-                      title={copySuccess ? '已复制' : '复制图标'}
-                    >
-                      {copySuccess ? <FiCheck size={18} /> : <FiCopy size={18} />}
-                    </button>
-                  </div>
-                  
-                  {downloadProgress[selectedApp.app.trackId]?.success && (
-                    <div className="download-success">
-                      ✅ 下载成功！
-                    </div>
-                  )}
-                  
-                  {downloadProgress[selectedApp.app.trackId]?.error && (
-                    <div className="download-error">
-                      ❌ 下载失败：{downloadProgress[selectedApp.app.trackId]?.error}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <div className="empty-state">
-                点击应用图标查看详情
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* 应用列表 */}
-        <div className="card">
-          <h2 className="section-title">
-            应用列表 ({apps.length})
-          </h2>
-          
-          {apps.length > 0 ? (
-            <div className="app-container">
-              <div className="scroll-area scrollbar-hidden">
-                <div className="app-grid">
-                  {apps.map((app) => (
-                    <div 
-                      key={app.trackId} 
-                      className={`app-item ${selectedApp?.app.trackId === app.trackId ? 'app-item-selected' : ''}`}
-                      onClick={() => handleAppClick(app)}
-                    >
-                      <div className="flex-center">
-                        <img
-                          src={app.artworkUrl100}
-                          alt={app.trackName}
-                          className="app-icon"
-                          title={`${app.trackName} - ${app.artistName}`}
-                        />
-                        
-                        {/* 选中状态指示器 */}
-                        {selectedApp?.app.trackId === app.trackId && (
-                          <div className="selected-indicator">
-                            <span>✓</span>
-                          </div>
-                        )}
+                  <div className="download-controls">
+                    <div className="size-selector">
+                      <label className="size-label">选择尺寸：</label>
+                      <div className="size-buttons">
+                        {['52', '60', '100', '512'].map((size) => (
+                          <button
+                            key={size}
+                            onClick={() => handleSizeSelect(size as IconSize)}
+                            className={`btn-sm ${selectedApp.selectedSize === size ? 'btn-sm-selected' : 'btn-sm-blue'}`}
+                          >
+                            {size}px
+                          </button>
+                        ))}
                       </div>
                     </div>
-                  ))}
+                    
+                    <div className="download-buttons">
+                      <button
+                        onClick={() => downloadToLocal(selectedApp.app, selectedApp.selectedSize)}
+                        disabled={downloadProgress[selectedApp.app.trackId]?.downloading}
+                        className="btn-icon btn-icon-primary"
+                        title={downloadProgress[selectedApp.app.trackId]?.downloading ? '下载中...' : '下载到本地'}
+                      >
+                        <FiDownload size={18} />
+                      </button>
+                      
+                      <button
+                        onClick={() => copyToClipboard(selectedApp.app, selectedApp.selectedSize)}
+                        className="btn-icon btn-icon-secondary"
+                        title={copySuccess ? '已复制' : '复制图标'}
+                      >
+                        {copySuccess ? <FiCheck size={18} /> : <FiCopy size={18} />}
+                      </button>
+                    </div>
+                    
+                    {downloadProgress[selectedApp.app.trackId]?.success && (
+                      <div className="download-success">
+                        ✅ 下载成功！
+                      </div>
+                    )}
+                    
+                    {downloadProgress[selectedApp.app.trackId]?.error && (
+                      <div className="download-error">
+                        ❌ 下载失败：{downloadProgress[selectedApp.app.trackId]?.error}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 应用网格 */}
+            <div className="apps-grid-section">
+              <h2 className="results-title">
+                找到 {apps.length} 个应用
+              </h2>
+              
+              <div className="app-container">
+                <div className="scroll-area scrollbar-hidden">
+                  <div className="app-grid">
+                    {apps.map((app) => (
+                      <div 
+                        key={app.trackId} 
+                        className={`app-item ${selectedApp?.app.trackId === app.trackId ? 'app-item-selected' : ''}`}
+                        onClick={() => handleAppClick(app)}
+                      >
+                        <div className="flex-center">
+                          <img
+                            src={app.artworkUrl100}
+                            alt={app.trackName}
+                            className="app-icon"
+                            title={`${app.trackName} - ${app.artistName}`}
+                          />
+                          
+                          {/* 选中状态指示器 */}
+                          {selectedApp?.app.trackId === app.trackId && (
+                            <div className="selected-indicator">
+                              <span>✓</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
-          ) : (
-            <div className="empty-state">
-              {loading || batchLoading ? '加载中...' : '输入关键词搜索应用，或点击批量获取热门应用'}
-            </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
