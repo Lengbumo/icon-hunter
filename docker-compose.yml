@@ -1,0 +1,39 @@
+# Icon Hunter Docker Compose 配置
+version: "3.8"
+
+services:
+  # ===========================================
+  # 主应用服务
+  # ===========================================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    container_name: icon-hunter
+    restart: unless-stopped
+    ports:
+      - "3000:8989"
+    environment:
+      - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1
+    env_file:
+      - .env
+    volumes:
+      - ./public/downloaded-icons:/app/public/downloaded-icons
+    networks:
+      - icon-hunter-network
+
+# ===========================================
+# 数据卷
+# ===========================================
+volumes:
+  icon-hunter-data:
+    driver: local
+
+# ===========================================
+# 网络
+# ===========================================
+networks:
+  icon-hunter-network:
+    driver: bridge
