@@ -1,336 +1,316 @@
 # 🎯 Icon Hunter
 
-一个基于 Next.js 的应用图标获取工具，可以搜索并下载 App Store 应用的高清图标。
+一个专业的 App Store 图标搜索下载工具，提供海量 SVG 矢量图标库。支持双语界面（中文/English），多国家地区搜索，多尺寸下载，一键复制功能。
 
-## ✨ 功能特性
+## ✨ 功能特点
 
-### 核心功能
+### 🎯 核心功能
 
-- **简洁搜索**：清洁的搜索界面，专注于用户体验
-- **国家选择**：搜索框前方的国家下拉选择器，支持指定国家或全球搜索，默认选择"All Countries"
-- **应用搜索**：通过关键词搜索 App Store 应用
-- **智能推荐**：一键获取热门应用列表
-- **应用详情**：点击应用图标查看详细信息（名称、开发者、分类、评分）
-- **多种操作**：支持下载 52px、60px、100px、512px 四种尺寸的图标
-  - **本地下载**：精致的 📥 图标按钮，一键下载到设备
-  - **图标复制**：精致的 📋 图标按钮，复制图标图片到剪贴板
-- **实时状态**：下载进度和状态实时反馈
-- **直观交互**：点击选择，纯图标按钮，悬浮提示说明
+- **App Store 图标搜索**: 搜索 iOS App Store 应用图标
+- **SVG 图标搜索**: 查找多个图标库的矢量图标
+- **多尺寸下载**: 支持 60px、100px、512px 等多种尺寸
+- **一键复制**: 快速复制图标到剪贴板
+- **国家地区筛选**: 按国家过滤 App Store 搜索结果
+- **双语支持**: 完整的中英文界面切换
 
-### 技术特性
+### 🌍 国际化特性
 
-- 🚀 基于 Next.js 14 App Router
-- 🎨 采用简洁现代的 Hero 设计风格
-- 📱 完全响应式设计，支持移动端
-- 🔄 实时下载进度显示
-- 📂 自动文件管理和去重
-- 🌐 调用苹果官方 iTunes Search API
-- 🎯 使用 React Icons 提供直观的图标化交互
-- 📋 支持现代浏览器的剪贴板 API，自动将图标转换为 PNG 格式复制到剪贴板
+- **多语言界面**: 中文/英文双语支持
+- **语言路由**: `/` (中文), `/en` (英文), `/zh-cn` (中文)
+- **SEO 优化**: 针对中英文搜索引擎优化
+- **本地化内容**: 语言特定的元数据和结构化数据
 
-## 🎨 界面设计
+### 🚀 技术亮点
 
-### 设计理念
+- **现代化架构**: Next.js 15 + TypeScript
+- **性能优化**: 图片懒加载、缓存策略、代码分割
+- **PWA 支持**: 渐进式 Web 应用特性
+- **响应式设计**: 完美适配桌面和移动设备
 
-采用 **极简主义设计**，以搜索为核心，提供清洁、直观的用户体验：
+## 🛠 技术栈
 
-#### 1. Hero Section 设计
-
-- **大标题**：`App Store Icon Finder` 居中显示
-- **组合搜索框**：深色主题的连体式设计，国家选择器+搜索输入框无缝连接
-- **深色主题**：现代感的灰色配色方案，提供更舒适的视觉体验
-- **搜索按钮**：简洁的深色按钮，提供即时反馈
-- **热门应用按钮**：直接在搜索区域提供快速访问
-- **紧凑布局**：减少空白空间，提高内容密度
-
-#### 2. 响应式搜索体验
-
-- **紧凑界面**：优化的布局减少空白空间
-- **双按钮设计**：搜索和热门应用按钮并列布局
-- **加载状态**：优雅的旋转动画和状态提示
-- **结果状态**：清晰的结果展示和应用详情
-
-#### 3. 视觉层次
-
-- **主要操作**：搜索框和按钮最突出
-- **次要信息**：应用网格和详情适当弱化
-- **状态反馈**：清晰的加载、成功、错误状态
-
-### 响应式设计
-
-- **移动端优先**：搜索框垂直布局，触摸友好
-- **平板适配**：搜索框和按钮水平布局
-- **桌面优化**：充分利用大屏幕空间
-- **统一体验**：所有设备保持一致的交互方式
-
-### 用户体验
-
-- **专注搜索**：首页聚焦搜索功能，减少干扰
-- **紧凑设计**：优化的垂直布局，减少空白空间浪费
-- **便捷操作**：搜索和热门应用按钮直接可用
-- **渐进式展示**：只在有搜索结果时显示应用网格
-- **即时反馈**：所有操作都有清晰的视觉反馈
-- **精致图标操作**：纯图标按钮设计，简洁美观
-  - 📥 下载按钮：小尺寸图标按钮，hover 动效
-  - 📋 复制按钮：小尺寸图标按钮，复制图标图片到剪贴板
-  - ✅ 状态反馈：复制成功后自动切换为勾号图标
-  - 💡 悬浮提示：鼠标悬浮显示操作说明
-
-## 🏗️ 项目结构
-
-```
-icon-hunter/
-├── app/                          # Next.js App Router
-│   ├── api/                     # API 路由
-│   │   ├── search-apps/         # 搜索应用接口
-│   │   ├── download-icon/       # 下载图标接口
-│   │   └── batch-apps/          # 批量获取应用接口
-│   ├── page.tsx                 # 主页面组件
-│   ├── layout.tsx               # 布局组件
-│   ├── globals.css              # 全局样式
-│   └── components.css           # 组件样式（统一 CSS）
-├── public/
-│   └── downloaded-icons/        # 下载的图标存储目录
-├── types/
-│   └── index.ts                 # TypeScript 类型定义
-├── package.json                 # 项目依赖
-└── README.md                    # 项目说明
-```
-
-## 🎨 样式架构
-
-### CSS 组织结构
-
-项目采用**现代化的 CSS 架构**，结合简洁设计理念构建高质量的用户界面：
-
-#### 1. 样式文件结构
-
-- **`globals.css`**：全局样式、基础重置、滚动条等
-- **`components.css`**：组件样式，按功能模块化组织
-
-#### 2. 样式分类
-
-**容器样式**
-
-- `.main-container`：主容器，简洁的渐变背景
-- `.content-wrapper`：内容包装器，控制最大宽度和居中
-
-**Hero Section 样式**
-
-- `.hero-section`：主页面区域，紧凑的垂直居中布局
-- `.hero-title`：大标题，响应式字体大小
-- `.search-section`：搜索区域容器，优化宽度
-- `.search-container`：搜索框和按钮的弹性布局
-- `.hero-search-input`：主搜索输入框，精致的边框和阴影
-- `.hero-search-btn`：搜索按钮，深色主题设计
-- `.hero-batch-btn`：热门应用按钮，灰色主题设计
-
-**状态和提示样式**
-
-- `.loading-state`：加载状态，紧凑的布局和旋转动画
-- `.spinner`：CSS 旋转动画，优化的尺寸和边距
-
-**结果展示样式**
-
-- `.results-section`：搜索结果区域
-- `.app-details-card`：应用详情卡片
-- `.apps-grid-section`：应用网格区域
-- `.results-title`：结果标题
-
-**组件样式**
-
-- `.btn-icon`：图标按钮，小巧精致
-- `.app-grid`：应用图标网格布局
-- `.app-item`、`.app-item-selected`：应用项和选中状态
-- `.selected-app-details`：选中应用详情展示
-- `.download-controls`：下载控制区域
-
-#### 3. 响应式设计
-
-所有样式都采用 **Mobile-First** 设计原则：
-
-```css
-/* 基础样式（移动端） */
-.app-grid {
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.5rem;
-}
-
-/* 平板样式 */
-@media (min-width: 640px) {
-  .app-grid {
-    grid-template-columns: repeat(6, 1fr);
-    gap: 0.75rem;
-  }
-}
-
-/* 桌面样式 */
-@media (min-width: 768px) {
-  .app-grid {
-    grid-template-columns: repeat(8, 1fr);
-    gap: 1rem;
-  }
-}
-```
-
-#### 4. 组合输入框设计
-
-- **连体设计**：国家选择器和搜索框物理连接，视觉统一
-- **深色主题**：使用 `#374151`、`#1f2937` 等现代深色配色
-- **圆角处理**：左侧选择器圆角，右侧输入框圆角，中间无缝连接
-- **自定义箭头**：SVG 下拉箭头替代浏览器默认样式
-- **响应式布局**：桌面端水平排列，移动端垂直堆叠
-
-#### 5. 样式命名规范
-
-- **语义化命名**：使用描述性的类名，如 `.search-input-group`、`.country-selector`
-- **模块化组织**：按功能模块划分，如按钮组、网格布局、状态指示器
-- **状态修饰符**：如 `.btn-primary`、`.btn-success`、`.btn-sm-blue`
-
-#### 6. 样式优势
-
-**可维护性**
-
-- 集中管理：所有样式在一个文件中，易于维护
-- 语义化：类名清晰表达用途和功能
-- 模块化：按功能分组，便于定位和修改
-
-**性能优化**
-
-- 减少类名长度：从长 Tailwind 类名压缩为简短自定义类名
-- 样式复用：相同样式只定义一次，提高复用性
-- 减少 HTML 体积：显著减少 HTML 中的类名字符数
-
-**扩展性**
-
-- 易于主题化：统一的 CSS 变量和颜色定义
-- 响应式一致性：所有组件遵循统一的响应式规则
-- 自定义灵活：可以轻松添加新的样式变体
+- **框架**: Next.js 15 with App Router
+- **语言**: TypeScript
+- **样式**: CSS Modules + 自定义 CSS
+- **图标**: React Icons (Feather Icons)
+- **国际化**: 自定义语言 Context 系统
+- **APIs**:
+  - iTunes Search API (App Store 数据)
+  - Iconify API (SVG 图标)
 
 ## 🚀 快速开始
 
-### 安装依赖
+### 1. 克隆仓库
+
+```bash
+git clone <repository-url>
+cd icon-hunter
+```
+
+### 2. 安装依赖
 
 ```bash
 npm install
 ```
 
-### 主要依赖
+### 3. 环境配置 (可选)
 
-- **next**: ^14.0.0 - React 全栈框架
-- **react**: ^18.0.0 - React 核心库
-- **typescript**: ^5.0.0 - TypeScript 支持
-- **react-icons**: ^4.0.0 - 图标库
+```bash
+# 创建环境变量文件
+touch .env.local
 
-### 启动开发服务器
+# 添加基础配置
+echo "NEXT_PUBLIC_BASE_URL=http://localhost:3000" >> .env.local
+```
+
+### 4. 启动开发服务器
 
 ```bash
 npm run dev
 ```
 
-访问 [http://localhost:3000](http://localhost:3000) 即可使用。
+### 5. 访问应用
 
-### 构建生产版本
+打开 [http://localhost:3000](http://localhost:3000) 开始使用
 
-```bash
-npm run build
-npm start
+## 📁 项目结构
+
+```
+icon-hunter/
+├── app/
+│   ├── [lang]/              # 动态语言路由
+│   │   ├── layout.tsx       # 语言特定布局
+│   │   └── page.tsx         # 语言页面
+│   ├── api/                 # API路由
+│   │   ├── search-apps/     # App Store搜索
+│   │   ├── search-svg/      # SVG图标搜索
+│   │   ├── batch-apps/      # 热门应用
+│   │   └── download-icon/   # 图标下载
+│   ├── contexts/            # React Contexts
+│   │   └── LanguageContext.tsx  # 语言状态管理
+│   ├── HomePage.tsx         # 主页面组件
+│   ├── components.css       # 组件样式
+│   ├── globals.css          # 全局样式
+│   ├── layout.tsx           # 根布局
+│   ├── page.tsx             # 默认首页
+│   ├── sitemap.ts           # 站点地图
+│   └── robots.ts            # 搜索引擎规则
+├── types/
+│   └── index.ts             # TypeScript类型定义
+├── public/
+│   ├── manifest.json        # PWA清单
+│   └── ...                  # 静态资源
+├── SEO-OPTIMIZATION-GUIDE.md  # SEO优化指南
+└── README.md
 ```
 
 ## 📋 使用说明
 
-### 1. 搜索应用
+### 1. 搜索应用图标
 
-- 在搜索框前方的下拉菜单中选择目标国家或地区（默认为"All Countries"）
-- 在搜索框中输入应用名称或关键词
-- 点击"搜索"按钮或按回车键
-- 系统将显示匹配的应用列表
+- 选择 **App Store** 标签页
+- 在国家下拉菜单中选择目标地区
+- 输入应用名称或关键词搜索
+- 点击应用图标查看详情
+- 选择尺寸后下载或复制
 
-### 2. 批量获取热门应用
+### 2. 搜索 SVG 图标
 
-- 点击"批量获取热门应用"按钮
-- 系统自动获取多个热门分类的应用
-- 结果按评分和受欢迎程度排序
+- 选择 **SVG 图标** 标签页
+- 输入图标关键词搜索
+- 点击图标查看详情信息
+- 下载 SVG 文件或复制代码
 
-### 3. 选择和查看应用详情
+### 3. 批量获取热门应用
 
-- 在应用网格中，点击任意应用图标
-- 选中的应用会显示蓝色边框和 ✓ 标记
-- 应用详情将在上方区域显示，包括：
-  - 应用大图标
-  - 应用名称和开发者
-  - 应用分类和评分信息
+- 在 App Store 标签页点击"热门应用"
+- 系统自动获取各分类热门应用
+- 按评分和受欢迎程度排序
 
-### 4. 下载和操作图标
+### 4. 语言切换
 
-- 在应用详情区域，选择所需的图标尺寸（60、100、512 像素）
-- 点击 📥 图标按钮下载到本地设备（鼠标悬浮显示"下载到本地"）
-- 点击 📋 图标按钮复制图标图片到剪贴板（鼠标悬浮显示"复制图标"）
-- 复制成功后按钮会短暂显示 ✅ 勾号图标
-- 下载状态会实时显示（下载中、成功、失败）
-- 图标文件命名格式：`应用名_应用ID_尺寸.扩展名`
+- 点击右上角的语言切换按钮
+- 支持中文(🌍 中)和英文(🌍EN)
+- 切换时 URL 会自动更新
 
-## 📐 图标尺寸说明
+## 🌐 API 接口
 
-### 可选尺寸
+| 路由                 | 方法 | 描述                |
+| -------------------- | ---- | ------------------- |
+| `/api/search-apps`   | GET  | 搜索 App Store 应用 |
+| `/api/batch-apps`    | GET  | 获取热门应用列表    |
+| `/api/search-svg`    | GET  | 搜索 SVG 图标       |
+| `/api/download-icon` | POST | 下载图标到服务器    |
 
-- **52px**：使用 60px 源图标，适合小图标显示和特殊需求
-- **60px**：iTunes API 原生支持的小尺寸图标
-- **100px**：iTunes API 原生支持的中等尺寸图标（默认选择）
-- **512px**：iTunes API 原生支持的高清大尺寸图标
+### API 参数示例
 
-### 技术说明
-
-由于 iTunes Search API 仅提供 60px、100px、512px 三种原生尺寸。
-
-## 🔧 API 接口说明
-
-### 1. 搜索应用 API
+**搜索应用**:
 
 ```
-GET /api/search-apps?term={keyword}&limit={number}&country={code}
+GET /api/search-apps?term=instagram&country=US&limit=50
 ```
 
-- `term`: 搜索关键词（必需）
-- `limit`: 返回结果数量限制，默认 50
-- `country`: 国家代码，默认 US
-
-### 2. 下载图标 API
+**搜索 SVG 图标**:
 
 ```
-POST /api/download-icon
-Body: {
-  iconUrl: string,
-  appName: string,
-  trackId: number,
-  size: string
-}
+GET /api/search-svg?term=home&limit=60&offset=0
 ```
 
-### 3. 批量获取应用 API
+**批量获取应用**:
 
 ```
-GET /api/batch-apps?category={category}&limit={number}&startIndex={number}
+GET /api/batch-apps?limit=100&country=CN
 ```
 
-- `category`: 应用分类（可选）
-- `limit`: 返回结果数量，默认 200
-- `startIndex`: 起始索引，用于分页
+## 🔧 SEO 优化
 
-### 4. 获取下载列表 API
+本项目包含完整的 SEO 优化配置，详见 [SEO 优化指南](./SEO-OPTIMIZATION-GUIDE.md)。
 
+### 主要 SEO 特性
+
+- ✅ 多语言元数据配置
+- ✅ 结构化数据 (JSON-LD)
+- ✅ Open Graph & Twitter Cards
+- ✅ 自动生成 sitemap.xml
+- ✅ 优化的 robots.txt
+- ✅ 性能优化配置
+- ✅ PWA 支持
+
+### 环境变量配置
+
+```env
+# 基础配置
+NEXT_PUBLIC_BASE_URL=https://your-domain.com
+
+# SEO验证 (可选)
+GOOGLE_VERIFICATION_ID=your_google_verification_id
+BAIDU_VERIFICATION_ID=your_baidu_verification_id
+YANDEX_VERIFICATION_ID=your_yandex_verification_id
+YAHOO_VERIFICATION_ID=your_yahoo_verification_id
+SOGOU_VERIFICATION_ID=your_sogou_verification_id
+
+# 分析工具 (可选)
+NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
+NEXT_PUBLIC_BAIDU_ANALYTICS_ID=your_baidu_analytics_id
 ```
-GET /api/download-icon
+
+## 📱 PWA 支持
+
+应用支持渐进式 Web 应用特性：
+
+- 📱 可安装到主屏幕
+- 🔄 离线缓存支持
+- 🚀 快速启动
+- 📊 应用快捷方式
+
+## 🌟 部署指南
+
+### Vercel 部署 (推荐)
+
+```bash
+# 安装Vercel CLI
+npm i -g vercel
+
+# 部署
+vercel
+
+# 配置环境变量
+vercel env add NEXT_PUBLIC_BASE_URL
 ```
 
-返回已下载的图标文件列表。
+### 自定义服务器
 
+```bash
+# 构建生产版本
+npm run build
 
-## 📜 许可证
+# 启动生产服务器
+npm start
+```
 
-MIT License - 详见 LICENSE 文件
+### Docker 部署
+
+```bash
+# 构建镜像
+docker build -t icon-hunter .
+
+# 运行容器
+docker run -p 3000:3000 icon-hunter
+```
+
+## 🔍 功能演示
+
+### 搜索功能
+
+1. **Tab 切换**: App Store 图标 / SVG 图标
+2. **国家选择**: 支持美国、中国、日本等多个国家
+3. **实时搜索**: 输入关键词即时搜索
+4. **热门应用**: 一键获取热门应用图标
+
+### 下载功能
+
+1. **多尺寸选择**: 60px / 100px / 512px
+2. **本地下载**: 直接下载到设备
+3. **剪贴板复制**: 一键复制图标
+4. **SVG 复制**: 复制 SVG 代码
+
+### 国际化功能
+
+1. **语言切换**: 点击右上角语言按钮
+2. **URL 同步**: 语言切换时 URL 自动更新
+3. **内容本地化**: 所有界面文本的双语支持
+
+## 🤝 贡献指南
+
+1. Fork 本仓库
+2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送分支 (`git push origin feature/AmazingFeature`)
+5. 创建 Pull Request
+
+### 开发规范
+
+- 使用 TypeScript 进行类型检查
+- 遵循 ESLint 规则
+- 添加必要的注释
+- 更新相关文档
+
+## 🐛 问题反馈
+
+如果您遇到任何问题或有改进建议，请：
+
+1. 查看 [常见问题](#常见问题)
+2. 搜索现有的 [Issues](../../issues)
+3. 创建新的 Issue 并提供详细信息
+
+## 🙋‍♂️ 常见问题
+
+**Q: 如何添加新的语言支持？**
+A: 在 `LanguageContext.tsx` 中添加新的翻译字典，并更新路由配置。
+
+**Q: 图标下载失败怎么办？**
+A: 检查网络连接，某些图标可能有跨域限制。
+
+**Q: 如何自定义样式主题？**
+A: 修改 `globals.css` 和 `components.css` 中的 CSS 变量。
+
+**Q: 支持哪些图标格式？**
+A: 支持 PNG、JPG 格式的 App Store 图标和 SVG 格式的矢量图标。
+
+**Q: 如何优化搜索结果？**
+A: 使用更具体的关键词，选择合适的国家地区，或尝试不同的搜索词。
+
+## 📄 许可证
+
+本项目采用 [MIT License](LICENSE) 开源协议。
 
 ## 🙏 致谢
 
 - 感谢苹果公司提供的 iTunes Search API
+- 感谢 Iconify 提供的优质 SVG 图标库
 - 感谢 Next.js 和 React 团队提供的优秀框架
+- 感谢所有为此项目做出贡献的开发者
+
+---
+
+如果这个项目对您有帮助，请给个 ⭐️ 支持一下！
