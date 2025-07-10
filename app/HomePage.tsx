@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { AppResult, DownloadProgress, DownloadedFile, IconSize, SelectedApp, SvgIcon, SvgSearchResponse, TabType, SelectedSvgIcon } from '@/types';
+import { AppResult, DownloadProgress, IconSize, SelectedApp, SvgIcon, SvgSearchResponse, TabType, SelectedSvgIcon } from '@/types';
 import { FiDownload, FiCopy, FiCheck, FiSearch, FiGlobe } from 'react-icons/fi';
 import { useLanguage } from './contexts/LanguageContext';
+import { useAnalytics } from './hooks/useAnalytics';
 
 export default function HomePage() {
   const { language, t, switchLanguageWithRoute } = useLanguage();
+  const { trackSearch, trackDownload, trackCopy } = useAnalytics();
   
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCountry, setSelectedCountry] = useState('All');
@@ -17,8 +19,7 @@ export default function HomePage() {
   const [error, setError] = useState('');
   const [downloadProgress, setDownloadProgress] = useState<DownloadProgress>({});
   const [batchLoading, setBatchLoading] = useState(false);
-  const [downloadedFiles, setDownloadedFiles] = useState<DownloadedFile[]>([]);
-  const [showDownloaded, setShowDownloaded] = useState(true);   
+   
   const [selectedApp, setSelectedApp] = useState<SelectedApp | null>(null);
   const [selectedSvgIcon, setSelectedSvgIcon] = useState<SelectedSvgIcon | null>(null);
   const [copySuccess, setCopySuccess] = useState(false);
@@ -55,9 +56,17 @@ export default function HomePage() {
       if (data.error) {
         setError(data.error);
       } else {
-        setApps(data.results || []);
+        const results = data.results || [];
+        setApps(results);
+        
+        // 发送搜索分析事件
+        trackSearch({
+          search_term: term,
+          search_type: 'app',
+          result_count: results.length
+        });
       }
-    } catch (err) {
+    } catch {
       setError(t('networkError'));
     } finally {
       setLoading(false);
@@ -78,7 +87,7 @@ export default function HomePage() {
       } else {
         setApps(data.results || []);
       }
-    } catch (err) {
+    } catch {
       setError(t('batchError'));
     } finally {
       setBatchLoading(false);
@@ -100,6 +109,13 @@ export default function HomePage() {
           // 新搜索，替换结果
           setSvgIcons(data.results);
           setSvgOffset(data.limit);
+          
+          // 发送搜索分析事件（仅在新搜索时发送）
+          trackSearch({
+            search_term: term,
+            search_type: 'svg',
+            result_count: data.results.length
+          });
         } else {
           // 加载更多，追加结果
           setSvgIcons(prev => [...prev, ...data.results]);
@@ -109,7 +125,7 @@ export default function HomePage() {
       } else {
         setError(t('networkError'));
       }
-    } catch (err) {
+    } catch {
       setError(t('networkError'));
     } finally {
       setLoading(false);
@@ -123,7 +139,7 @@ export default function HomePage() {
     
     try {
       await searchSvgIcons(searchTerm, svgOffset);
-    } catch (err) {
+    } catch {
       setError(t('loadMoreError'));
     } finally {
       setLoadingMore(false);
@@ -209,7 +225,14 @@ export default function HomePage() {
         [app.trackId]: { downloading: false, success: true }
       }));
       
-    } catch (err) {
+      // 发送下载分析事件
+      trackDownload({
+        item_type: 'app_icon',
+        item_name: app.trackName,
+        size: `${size}px`
+      });
+      
+    } catch {
       setDownloadProgress(prev => ({
         ...prev,
         [app.trackId]: { downloading: false, success: false, error: '下载失败' }
@@ -241,17 +264,24 @@ export default function HomePage() {
         
         canvas.toBlob(async (pngBlob) => {
           if (pngBlob) {
-            try {
-              await navigator.clipboard.write([
-                new ClipboardItem({
-                  'image/png': pngBlob
-                })
-              ]);
-              setCopySuccess(true);
-              setTimeout(() => setCopySuccess(false), 2000);
-            } catch (err) {
-              console.error('复制失败:', err);
-            }
+                          try {
+                await navigator.clipboard.write([
+                  new ClipboardItem({
+                    'image/png': pngBlob
+                  })
+                ]);
+                setCopySuccess(true);
+                setTimeout(() => setCopySuccess(false), 2000);
+                
+                // 发送复制分析事件
+                trackCopy({
+                  item_type: 'app_icon',
+                  item_name: app.trackName,
+                  size: `${size}px`
+                });
+              } catch (_err) {
+                console.error('复制失败:', _err);
+              }
           }
         }, 'image/png');
         
@@ -280,6 +310,12 @@ export default function HomePage() {
       document.body.removeChild(link);
       
       URL.revokeObjectURL(url);
+      
+      // 发送下载分析事件
+      trackDownload({
+        item_type: 'svg_icon',
+        item_name: icon.name
+      });
     } catch (err) {
       console.error('下载SVG失败:', err);
     }
@@ -293,51 +329,18 @@ export default function HomePage() {
       await navigator.clipboard.writeText(svgContent);
       setCopySuccess(true);
       setTimeout(() => setCopySuccess(false), 2000);
-    } catch (err) {
-      console.error('复制SVG失败:', err);
-    }
-  };
-
-  const downloadIcon = async (app: AppResult, size: IconSize) => {
-    const iconUrl = size === '60' ? app.artworkUrl60 : 
-                   size === '100' ? app.artworkUrl100 : 
-                   app.artworkUrl512;
-    
-    setDownloadProgress(prev => ({
-      ...prev,
-      [app.trackId]: { downloading: true, success: false }
-    }));
-
-    try {
-      const response = await fetch(`/api/download-icon`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          iconUrl,
-          fileName: `${app.trackName}_${app.trackId}_${size}`
-        }),
+      
+      // 发送复制分析事件
+      trackCopy({
+        item_type: 'svg_icon',
+        item_name: icon.name
       });
-
-      if (response.ok) {
-        const result = await response.json();
-        setDownloadedFiles(prev => [result, ...prev]);
-        
-        setDownloadProgress(prev => ({
-          ...prev,
-          [app.trackId]: { downloading: false, success: true }
-        }));
-      } else {
-        throw new Error('下载失败');
-      }
-    } catch (err) {
-      setDownloadProgress(prev => ({
-        ...prev,
-        [app.trackId]: { downloading: false, success: false, error: '下载失败' }
-      }));
+    } catch (_err) {
+      console.error('复制SVG失败:', _err);
     }
   };
+
+
 
   const loadDownloadedFiles = async () => {
     try {
@@ -347,21 +350,15 @@ export default function HomePage() {
         // 解析HTML获取文件列表
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
-        const links = doc.querySelectorAll('a[href$=".png"], a[href$=".jpg"], a[href$=".jpeg"]');
+        doc.querySelectorAll('a[href$=".png"], a[href$=".jpg"], a[href$=".jpeg"]');
         // 这里可以进一步处理文件列表
       }
-    } catch (err) {
-      console.error('加载下载文件失败:', err);
+    } catch (_err) {
+      console.error('加载下载文件失败:', _err);
     }
   };
 
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return t('unknown');
-    const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
+
 
   useEffect(() => {
     loadDownloadedFiles();

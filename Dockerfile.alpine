@@ -1,5 +1,5 @@
-# Icon Hunter Dockerfile - 优化版本
-# 稳定的Alpine构建，适合生产环境
+# Icon Hunter Dockerfile - Alpine优化版本
+# 适合国内用户的最小化构建
 
 # ==========================================
 # 依赖安装阶段
@@ -45,15 +45,13 @@ RUN echo "🔧 开始构建过程..." && \
         export NEXT_TELEMETRY_DISABLED=1; \
     fi && \
     echo "🚀 开始构建应用..." && \
-    NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL \
-    NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
-    NEXT_PUBLIC_GA_ID=$NEXT_PUBLIC_GA_ID \
-    NEXT_PUBLIC_BAIDU_ANALYTICS_ID=$NEXT_PUBLIC_BAIDU_ANALYTICS_ID \
     npm run build && \
+    echo "🧹 清理构建配置文件..." && \
+    rm -f .env.build && \
     echo "✅ 构建完成!"
 
 # ==========================================
-# 运行阶段 - 优化的Alpine
+# 运行阶段 - 最小Alpine
 # ==========================================
 FROM node:18-alpine AS runner
 
@@ -86,4 +84,4 @@ EXPOSE 3000
 ENTRYPOINT ["/sbin/tini", "--"]
 
 # 启动应用
-CMD ["node", "server.js"]
+CMD ["node", "server.js"] 

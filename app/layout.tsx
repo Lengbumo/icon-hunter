@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "./components.css";
 import { LanguageProvider } from './contexts/LanguageContext';
+import Analytics from './components/Analytics';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -152,6 +153,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        {/* 分析工具 */}
+        <Analytics 
+          gaId={process.env.NEXT_PUBLIC_GA_ID}
+          baiduId={process.env.NEXT_PUBLIC_BAIDU_ANALYTICS_ID}
+        />
+        
         <LanguageProvider>
           {children}
         </LanguageProvider>

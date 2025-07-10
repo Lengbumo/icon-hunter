@@ -13,7 +13,7 @@ services:
     container_name: icon-hunter
     restart: unless-stopped
     ports:
-      - "3000:8989"
+      - "8989:3000"
     environment:
       - NODE_ENV=production
       - NEXT_TELEMETRY_DISABLED=1

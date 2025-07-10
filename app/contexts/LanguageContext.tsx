@@ -5,10 +5,15 @@ import { useRouter, usePathname } from 'next/navigation';
 
 export type Language = 'zh' | 'en';
 
+// 定义翻译参数的类型
+interface TranslationParams {
+  [key: string]: string | number;
+}
+
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string, params?: Record<string, any>) => string;
+  t: (key: string, params?: TranslationParams) => string;
   switchLanguageWithRoute: () => void;
 }
 
@@ -160,7 +165,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   };
 
   // 翻译函数
-  const t = (key: string, params?: Record<string, any>): string => {
+  const t = (key: string, params?: TranslationParams): string => {
     let text = translations[language][key as keyof typeof translations['zh']] || key;
     
     // 支持参数替换，如 {count}

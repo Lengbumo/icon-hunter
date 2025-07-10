@@ -31,9 +31,16 @@ interface IconifySearchResult {
   collections: Record<string, {
     name: string;
     total: number;
-    author?: any;
-    license?: any;
-    samples?: any[];
+    author?: string | {
+      name: string;
+      url?: string;
+    };
+    license?: string | {
+      title: string;
+      spdx?: string;
+      url?: string;
+    };
+    samples?: string[];
     height?: number;
     category?: string;
     tags?: string[];
@@ -43,13 +50,6 @@ interface IconifySearchResult {
     query: string;
     limit: string;
   };
-}
-
-interface IconifyIconInfo {
-  body: string;
-  width?: number;
-  height?: number;
-  viewBox?: string;
 }
 
 // 备用图标数据 - 当外部API不可用时使用
@@ -241,8 +241,8 @@ export async function GET(request: NextRequest) {
             url: iconUrl,
             source: collectionInfo?.name || collectionId,
             category: collectionInfo?.category || 'General',
-            license: collectionInfo?.license?.title || collectionInfo?.license || 'Unknown',
-            author: collectionInfo?.author?.name || collectionInfo?.author || 'Unknown',
+            license: typeof collectionInfo?.license === 'object' ? collectionInfo.license.title : collectionInfo?.license || 'Unknown',
+            author: typeof collectionInfo?.author === 'object' ? collectionInfo.author.name : collectionInfo?.author || 'Unknown',
             downloadUrl: iconUrl
           });
         }

@@ -82,3 +82,105 @@ tests
 connect.lock
 typings/
 .eslintcache
+
+# 开发工具和配置
+.env
+.env.*
+!.env.example
+!.env.build
+eslint.config.*
+postcss.config.*
+.eslintrc.*
+.prettierrc*
+.editorconfig
+
+# 构建缓存和临时文件
+.tsbuildinfo
+*.tsbuildinfo
+.swc/
+.parcel-cache/
+
+# 源码管理和CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+.circleci/
+
+# 包管理器文件（保留package.json和package-lock.json）
+yarn.lock
+pnpm-lock.yaml
+.pnpm-store/
+.yarn/
+.yarnrc*
+
+# 大文件和媒体文件（如果不需要）
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.flv
+*.webm
+*.mkv
+*.m4v
+*.3gp
+*.3g2
+*.gif
+*.webp
+*.bmp
+*.tiff
+*.psd
+*.ai
+*.sketch
+*.fig
+
+# 备份和临时文件
+*.bak
+*.backup
+*.old
+*.orig
+*.rej
+*~
+.#*
+\#*#
+
+# IDE和编辑器特定文件
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.swp
+*.swo
+*~
+
+# 系统文件
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# 文档和说明（保留重要文档）
+docs/
+documentation/
+examples/
+demo/
+.github/
+CHANGELOG*
+CONTRIBUTING*
+AUTHORS*
+COPYING*
+INSTALL*
+NEWS*
+UPGRADING*
+*.md
+!README.md

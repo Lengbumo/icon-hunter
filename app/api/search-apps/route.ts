@@ -19,9 +19,29 @@ export interface AppResult {
   version: string;
 }
 
+// iTunes API 返回的原始应用数据类型
+export interface iTunesAppResponse {
+  trackId: number;
+  trackName: string;
+  artistName: string;
+  bundleId: string;
+  artworkUrl60: string;
+  artworkUrl100: string;
+  artworkUrl512: string;
+  description: string;
+  primaryGenreName: string;
+  averageUserRating?: number;
+  userRatingCount?: number;
+  trackViewUrl: string;
+  currency: string;
+  price?: number;
+  fileSizeBytes?: number;
+  version?: string;
+}
+
 export interface iTunesSearchResponse {
   resultCount: number;
-  results: AppResult[];
+  results: iTunesAppResponse[];
 }
 
 export async function GET(request: NextRequest) {
@@ -57,7 +77,7 @@ export async function GET(request: NextRequest) {
     const data: iTunesSearchResponse = await response.json();
 
     // 过滤和格式化数据
-    const formattedResults = data.results.map((app: any) => ({
+    const formattedResults = data.results.map((app: iTunesAppResponse) => ({
       trackId: app.trackId,
       trackName: app.trackName,
       artistName: app.artistName,

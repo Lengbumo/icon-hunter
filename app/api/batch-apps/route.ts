@@ -1,5 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// 定义应用数据类型
+interface AppData {
+  trackId: number;
+  trackName: string;
+  artistName: string;
+  bundleId: string;
+  artworkUrl60: string;
+  artworkUrl100: string;
+  artworkUrl512: string;
+  description: string;
+  primaryGenreName: string;
+  averageUserRating: number;
+  userRatingCount: number;
+  trackViewUrl: string;
+  currency: string;
+  price: number;
+  fileSizeBytes: number;
+  version: string;
+  searchTerm: string;
+}
+
+// iTunes API 响应中的应用数据类型
+interface iTunesAppData {
+  trackId: number;
+  trackName: string;
+  artistName: string;
+  bundleId: string;
+  artworkUrl60: string;
+  artworkUrl100: string;
+  artworkUrl512: string;
+  description: string;
+  primaryGenreName: string;
+  averageUserRating?: number;
+  userRatingCount?: number;
+  trackViewUrl: string;
+  currency: string;
+  price?: number;
+  fileSizeBytes?: number;
+  version?: string;
+}
+
 // 热门应用分类
 const POPULAR_CATEGORIES = [
   'games', 'social networking', 'entertainment', 'utilities', 'productivity',
@@ -23,7 +64,7 @@ export async function GET(request: NextRequest) {
     const country = searchParams.get('country') || 'US';
     const startIndex = parseInt(searchParams.get('startIndex') || '0');
 
-    let allApps: any[] = [];
+    let allApps: AppData[] = [];
     let searchTerms: string[] = [];
 
     if (category && POPULAR_CATEGORIES.includes(category.toLowerCase())) {
@@ -64,11 +105,11 @@ export async function GET(request: NextRequest) {
     const searchResults = await Promise.all(searchPromises);
 
     // 合并和去重结果
-    const appMap = new Map();
+    const appMap = new Map<number, AppData>();
     
     searchResults.forEach((result, index) => {
       if (result.results) {
-        result.results.forEach((app: any) => {
+        result.results.forEach((app: iTunesAppData) => {
           if (!appMap.has(app.trackId)) {
             appMap.set(app.trackId, {
               trackId: app.trackId,

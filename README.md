@@ -37,23 +37,85 @@ npm run dev
 
 打开 [http://localhost:3000](http://localhost:3000) 开始使用
 
+## 🐳 Docker 部署
 
-### 环境变量配置
+### 手动构建
+
+```bash
+# Alpine版本 (推荐)
+docker build -f Dockerfile.alpine -t icon-hunter .
+
+# Distroless版本 (最小体积)
+docker build -f Dockerfile -t icon-hunter .
+```
+
+### 运行容器
+
+```bash
+# 运行应用
+docker run -p 3000:3000 icon-hunter
+
+# 后台运行
+docker run -d -p 3000:3000 --name icon-hunter-app icon-hunter
+
+# 带环境变量运行
+docker run -p 3000:3000 -e NODE_ENV=production icon-hunter
+```
+
+### Docker Compose 部署
+
+#### 1. 配置环境变量
+
+首先创建 `.env` 文件：
+
+```bash
+# 复制模板文件
+cp .env.example .env
+
+# 编辑配置
+nano .env
+```
+
+设置您的域名：
 
 ```env
-# 基础配置
+# 必需配置
 NEXT_PUBLIC_BASE_URL=https://your-domain.com
+NEXT_PUBLIC_API_URL=https://your-domain.com/api
+```
 
-# SEO验证 (可选)
-GOOGLE_VERIFICATION_ID=your_google_verification_id
-BAIDU_VERIFICATION_ID=your_baidu_verification_id
-YANDEX_VERIFICATION_ID=your_yandex_verification_id
-YAHOO_VERIFICATION_ID=your_yahoo_verification_id
-SOGOU_VERIFICATION_ID=your_sogou_verification_id
+#### 2. 启动服务
 
-# 分析工具 (可选)
-NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
-NEXT_PUBLIC_BAIDU_ANALYTICS_ID=your_baidu_analytics_id
+```bash
+# 构建并启动
+docker-compose up -d
+
+# 查看日志
+docker-compose logs -f
+```
+
+#### 3. 完整的 docker-compose.yml 配置
+
+当前配置已支持从 `.env` 文件读取环境变量：
+
+```yaml
+version: "3.8"
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL}
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+    ports:
+      - "8989:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1
+    env_file:
+      - .env
+    restart: unless-stopped
 ```
 
 ## 📄 许可证
@@ -65,6 +127,7 @@ NEXT_PUBLIC_BAIDU_ANALYTICS_ID=your_baidu_analytics_id
 - 感谢苹果公司提供的 iTunes Search API
 - 感谢 Iconify 提供的优质 SVG 图标库
 - 感谢 Next.js 和 React 团队提供的优秀框架
+
 ---
 
 如果这个项目对您有帮助，请给个 ⭐️ 支持一下！

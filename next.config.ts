@@ -3,6 +3,9 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* SEO和性能优化配置 */
   
+  // Docker部署配置
+  output: 'standalone',
+  
   // 性能优化
   compress: true,
   poweredByHeader: false,
@@ -29,12 +32,14 @@ const nextConfig: NextConfig = {
   // 实验性功能
   experimental: {
     optimizePackageImports: ['react-icons'],
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
+  },
+
+  // Turbopack 配置（现在已稳定）
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
       },
     },
   },
